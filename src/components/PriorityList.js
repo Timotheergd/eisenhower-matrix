@@ -1,6 +1,6 @@
 import React from 'react';
-import { getScoreColor } from '../helpers';
-import { Star } from 'lucide-react';
+// MODIFIED: Import the new helper function
+import { getScoreColor, getPastelColor, getDarkerColor } from '../helpers';
 
 const PriorityList = ({ tasks, onTaskSelect }) => {
   return (
@@ -12,21 +12,28 @@ const PriorityList = ({ tasks, onTaskSelect }) => {
         {tasks.length > 0 ? tasks.map(task => {
           const scoreColor = getScoreColor(task.score);
 
+          const scoreStyle = task.isToday 
+            ? { 
+                backgroundColor: getPastelColor(scoreColor),
+                // MODIFIED: Use the new darker color for the number to ensure high contrast
+                color: getDarkerColor(scoreColor),
+                border: `2px solid ${scoreColor}`
+              }
+            : { 
+                backgroundColor: scoreColor,
+                color: 'white',
+                textShadow: '0px 1px 2px rgba(0, 0, 0, 0.5)'
+              };
+
           return (
             <div key={task.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border cursor-pointer hover:bg-indigo-50" onClick={() => onTaskSelect(task)}>
               <div className="flex items-center gap-3">
                 <span 
-                  className="font-bold text-sm w-16 text-center py-1 rounded-full" 
-                  style={{
-                    backgroundColor: scoreColor,
-                    color: 'white',
-                    textShadow: '0px 1px 2px rgba(0, 0, 0, 0.5)'
-                  }}
+                  className="font-bold text-sm w-16 text-center py-1 rounded-full transition-all"
+                  style={scoreStyle}
                 >
                   {task.score.toFixed(1)}
                 </span>
-                {/* MODIFIED: Add a star if the task is marked for today */}
-                {task.isToday && <Star size={16} className="text-yellow-500 fill-yellow-400" />}
                 <p className="font-semibold text-gray-700">{task.title}</p>
               </div>
               <div className="flex items-center gap-4 text-sm text-gray-600">

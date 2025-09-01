@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import Header from './components/Header';
 import MatrixPage from './components/MatrixPage';
@@ -43,6 +43,21 @@ const App = () => {
       setTasks([...tasks, newTask]);
     }
     closeModal();
+  };
+
+  const handleDuplicateTask = (taskId) => {
+    const taskToDuplicate = tasks.find(t => t.id === taskId);
+    if (!taskToDuplicate) return;
+    const newTask = {
+      ...taskToDuplicate,
+      id: Date.now(),
+      title: `${taskToDuplicate.title} (Copy)`,
+      isToday: false, // Duplicates are not automatically added to today's plan
+      startTime: null,
+      endTime: null,
+    };
+    setTasks([...tasks, newTask]);
+    setSelectedTask(newTask); // Select the new duplicated task
   };
 
   const handleToggleToday = (taskId) => {
@@ -123,6 +138,7 @@ const App = () => {
               setSelectedTask={setSelectedTask}
               onEditTask={openModal}
               onToggleToday={handleToggleToday}
+              onDuplicateTask={handleDuplicateTask} // MODIFIED: Pass handler
             />
           )}
           {currentPage === 'today' && (
@@ -130,7 +146,12 @@ const App = () => {
               tasks={tasks.filter(t => t.isToday)}
               onScheduleTask={handleScheduleTask}
               onUnscheduleTask={handleUnscheduleTask}
-              onAddTask={() => openModal()} // MODIFIED: Pass the handler
+              onAddTask={() => openModal()}
+              // MODIFIED: Pass handlers for shortcut
+              onViewDetails={(task) => {
+                setSelectedTask(task);
+                setCurrentPage('matrix');
+              }}
             />
           )}
         </main>
@@ -141,7 +162,7 @@ const App = () => {
             onClose={closeModal}
             onSubmit={handleSubmit}
             editingTask={editingTask}
-            currentPage={currentPage} // MODIFIED: Pass current page
+            currentPage={currentPage}
           />
         )}
       </div>

@@ -1,37 +1,15 @@
-// MODIFIED: The entire calculateUrgency function is new
 export const calculateUrgency = (deadline) => {
   if (!deadline) return 0;
-
   const now = new Date();
-  // Normalize "now" to the start of the current day for accurate day difference calculation
   now.setHours(0, 0, 0, 0);
-
   const deadlineDate = new Date(deadline);
-  // Normalize the deadline to the start of its day
   deadlineDate.setHours(0, 0, 0, 0);
-
   const diffTime = deadlineDate - now;
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  // Overdue tasks are maximum urgency
-  if (diffDays < 0) {
-    return 100;
-  }
-  // Tasks due today have a fixed, very high urgency
-  if (diffDays === 0) {
-    return 95;
-  }
-  // For tasks due in the future, use a logarithmic decay curve.
-  // This means urgency drops sharply at first, then more slowly.
-  // We cap the meaningful range at 30 days.
-  if (diffDays > 30) {
-    return 10;
-  }
-
-  // This formula maps day 1 to an urgency of ~94 and day 30 to an urgency of 10.
-  // It's derived from: 94 - ( (94-10) / ln(30) ) * ln(diffDays)
+  if (diffDays < 0) return 100;
+  if (diffDays === 0) return 95;
+  if (diffDays > 30) return 10;
   const urgency = 94 - 24.697 * Math.log(diffDays);
-  
   return Math.round(urgency);
 };
 
@@ -41,6 +19,32 @@ export const getScoreColor = (score) => {
   const normalizedScore = Math.max(0, Math.min(100, score));
   const hue = (1 - normalizedScore / 100) * 120;
   return `hsl(${hue}, 90%, 55%)`;
+};
+
+export const getPastelColor = (hslColor) => {
+  if (!hslColor || !hslColor.startsWith('hsl')) {
+    return '#f3f4f6';
+  }
+  const parts = hslColor.match(/(\d+(\.\d+)?)/g);
+  if (!parts || parts.length < 3) {
+    return '#f3f4f6';
+  }
+  const [hue, saturation] = parts;
+  return `hsl(${hue}, ${saturation}%, 90%)`;
+};
+
+// NEW: Helper function to create a darker version of a given HSL color for text
+export const getDarkerColor = (hslColor) => {
+  if (!hslColor || !hslColor.startsWith('hsl')) {
+    return '#1f2937'; // A dark gray fallback
+  }
+  const parts = hslColor.match(/(\d+(\.\d+)?)/g);
+  if (!parts || parts.length < 3) {
+    return '#1f2937';
+  }
+  const [hue, saturation] = parts;
+  // Use the same hue and saturation but with a much lower lightness for high contrast
+  return `hsl(${hue}, ${saturation}%, 40%)`;
 };
 
 export const getQuadrant = (importance, urgency) => {

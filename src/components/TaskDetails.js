@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Target, Edit2, Trash2, CheckCircle, Save, X, Calendar as CalendarIcon, PlusCircle, MinusCircle } from 'lucide-react';
+import { Target, Edit2, Trash2, CheckCircle, Save, X, Calendar as CalendarIcon, PlusCircle, MinusCircle, Copy } from 'lucide-react';
 import { calculateUrgency, getQuadrant, getDifficultyColor, formatDateEuropean } from '../helpers';
 
-const TaskDetails = ({ selectedTask, onEdit, onDelete, onComplete, onToggleToday, setTasks, tasks }) => {
+const TaskDetails = ({ selectedTask, onEdit, onDelete, onComplete, onToggleToday, onDuplicate, setTasks, tasks }) => {
   const [editingInline, setEditingInline] = useState(null);
   const [tempTitle, setTempTitle] = useState('');
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
   useEffect(() => {
     if (selectedTask) {
       setTempTitle(selectedTask.title);
+      setIsDescriptionExpanded(false); // Reset on new task selection
     }
   }, [selectedTask]);
 
@@ -43,6 +45,9 @@ const TaskDetails = ({ selectedTask, onEdit, onDelete, onComplete, onToggleToday
     setEditingInline(null);
   };
 
+  const isLongDescription = description && description.length > 120;
+  const displayedDescription = isLongDescription && !isDescriptionExpanded ? `${description.substring(0, 120)}...` : description;
+
   return (
     <div className="bg-white rounded-xl shadow-lg border p-6 sticky top-6">
       <div className="space-y-4">
@@ -63,7 +68,17 @@ const TaskDetails = ({ selectedTask, onEdit, onDelete, onComplete, onToggleToday
             <h3 className="text-2xl font-bold text-gray-800 cursor-pointer" onClick={() => setEditingInline('title')}>{title}</h3>
           )}
         </div>
-        <p className="text-gray-600">{description || <span className="italic">No description</span>}</p>
+        {/* MODIFIED: Description with "Read More" */}
+        <div>
+          <p className="text-gray-600" style={{ whiteSpace: 'pre-wrap' }}>
+            {displayedDescription || <span className="italic">No description</span>}
+          </p>
+          {isLongDescription && (
+            <button onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)} className="text-indigo-600 text-sm font-semibold mt-1">
+              {isDescriptionExpanded ? 'Read Less' : 'Read More'}
+            </button>
+          )}
+        </div>
         
         <button onClick={() => onToggleToday(id)} className={`w-full flex items-center justify-center gap-2 text-sm px-3 py-2 rounded-lg transition-colors ${isToday ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-blue-100 text-blue-700 hover:bg-blue-200'}`}>
           {isToday ? <MinusCircle size={16} /> : <PlusCircle size={16} />}
@@ -77,8 +92,16 @@ const TaskDetails = ({ selectedTask, onEdit, onDelete, onComplete, onToggleToday
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-3"><span className="text-sm font-semibold text-gray-700">Difficulty</span><div className="flex items-center gap-3"><div className="text-xl font-bold text-gray-800">{difficulty}</div><div className="w-full bg-gray-200 rounded-full h-3"><div className="h-3 rounded-full" style={{ width: `${difficulty}%`, backgroundColor: getDifficultyColor(difficulty) }} /></div></div></div>
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-3"><div className="flex items-center gap-2"><CalendarIcon className="w-4 h-4 text-gray-600" /><span className="text-sm font-semibold text-gray-700">Deadline</span></div><div className="text-lg font-bold text-gray-800">{formatDateEuropean(deadline)}</div></div>
         <div className="flex gap-3 pt-2">
-          <button onClick={() => onEdit(selectedTask)} className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"><Edit2 size={16} /> Edit</button>
-          <button onClick={() => onDelete(id)} className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center justify-center gap-2"><Trash2 size={16} /> Delete</button>
+          {/* NEW: Duplicate Button */}
+          <button onClick={() => onDuplicate(id)} className="flex-1 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 flex items-center justify-center gap-2">
+            <Copy size={16} /> Duplicate
+          </button>
+          <button onClick={() => onEdit(selectedTask)} className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2">
+            <Edit2 size={16} /> Edit
+          </button>
+          <button onClick={() => onDelete(id)} className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center justify-center gap-2">
+            <Trash2 size={16} /> Delete
+          </button>
         </div>
       </div>
     </div>

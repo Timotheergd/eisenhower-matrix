@@ -1,46 +1,153 @@
-# Getting Started with Create React App
+# Advanced Eisenhower Matrix & Daily Planner
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+> A dynamic and interactive task management application to turn your strategic goals into daily actions.
 
-## Available Scripts
+This project goes beyond a simple Eisenhower Matrix. It's a complete system for visualizing task priorities, planning your day with a drag-and-drop timeline, and ensuring you're always working on what matters most.
 
-In the project directory, you can run:
+<!-- ![Application Screenshot](placeholder.png) -->
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## About The Project
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+The core of this application is the **Eisenhower Matrix**, a productivity principle that helps you prioritize tasks by urgency and importance. This app brings the matrix to life with a dynamic, interactive graph.
 
-### `npm test`
+However, strategic planning is only half the battle. This tool bridges the gap between strategy and execution with a dedicated **"Today's Plan"** page, allowing you to build a visual timeline for your day and commit to specific time blocks for your most critical tasks.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Key Features
 
-### `npm run build`
+*   **Interactive Matrix Graph:** Visualize all your tasks on the importance/urgency graph. The graph is not static; it's a living canvas.
+*   **Advanced Point & Label Placement:** A smart algorithm prevents points and labels from overlapping. It uses a hybrid approach of circular placement for identical points and a force-directed layout for nearby clusters. Crowded labels are automatically placed with "leader lines" to ensure every task title is always visible and readable.
+*   **Dynamic Priority Scoring:** Tasks are sorted in a "Priority To-Do List" using a weighted formula (`score = (urgency² + 2 * importance²) / max`) to surface the most critical items.
+*   **Today's Plan Timeline:** A dedicated page to plan your day.
+    *   Drag and drop tasks from a "Task Pool" onto a vertical timeline.
+    *   Visually adjust start and end times with resize handles.
+    *   Automatic side-by-side layout for overlapping events.
+    *   A real-time line shows you the current time.
+*   **Data Persistence:** Your tasks are automatically saved to your browser's local storage. No need to worry about losing your work.
+*   **Import & Export:**
+    *   Backup and share your entire setup with JSON import/export.
+    *   Export your daily schedule to a standard `.ics` (iCal) file to use in Google Calendar, Outlook, or Apple Calendar.
+*   **Task Management:** Includes a full suite of features like task completion, history with configurable retention, duplication, and inline editing.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## The Workflow: From Strategy to Action
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+This tool is designed to support a powerful weekly workflow.
 
-### `npm run eject`
+1.  **Strategic Planning (The Matrix Page):** Use the main matrix view to get a "big picture" overview. Add new projects, break them down into smaller tasks, and adjust their importance and deadlines. This is your command center.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+2.  **Daily Execution (The Today's Plan Page):** At the start of each day, review your matrix. For tasks you intend to complete, click "Add to Today's Plan." Then, switch to the "Today's Plan" page. You'll see your chosen tasks in the "Task Pool," ready to be dragged onto your timeline to build a concrete, visual schedule.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+3.  **The Weekly Review:** Once a week, use the matrix to review your progress. Mark tasks as complete, break down upcoming projects, and ensure your daily actions are aligned with your long-term goals.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+---
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## Built With
 
-## Learn More
+*   [React](https://reactjs.org/)
+*   [Tailwind CSS](https://tailwindcss.com/)
+*   [Lucide React](https://lucide.dev/guide/packages/lucide-react) (for icons)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+---
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Getting Started
+
+Follow these instructions to get a copy of the project up and running on your local machine.
+
+### Prerequisites
+
+You will need `Node.js` (which includes `npm`) and `git` installed on your system.
+
+*   **Node.js:** Download and install it from the official website: [nodejs.org](https://nodejs.org/). It is recommended to use the LTS (Long Term Support) version.
+*   **Git:** If you don't have git, you can download it from [git-scm.com](https://git-scm.com/).
+
+### Installation
+
+1.  **Clone the repository**
+    Open your terminal or command prompt and run:
+    ```sh
+    git clone https://github.com/your-username/your-repository-name.git
+    ```
+    *(Replace `your-username/your-repository-name` with the actual URL of your GitHub repository)*
+
+2.  **Navigate to the project directory**
+    ```sh
+    cd your-repository-name
+    ```
+
+3.  **Install NPM packages**
+    This will install all the necessary dependencies for the project.
+    ```sh
+    npm install
+    ```
+
+4.  **Run the application**
+    This will start the development server, and the application should automatically open in your default web browser at `http://localhost:3000`.
+    ```sh
+    npm start
+    ```
+
+### OS-Specific Prerequisite Installation
+
+If you don't have `Node.js` or `git`, here are quick commands for various operating systems:
+
+*   **Windows (using winget):**
+    Open PowerShell and run:
+    ```powershell
+    winget install OpenJS.NodeJS.LTS
+    winget install Git.Git
+    ```
+
+*   **macOS (using Homebrew):**
+    Open your terminal and run:
+    ```sh
+    brew install node
+    brew install git
+    ```
+
+*   **Linux (Debian/Ubuntu):**
+    ```sh
+    sudo apt update
+    sudo apt install nodejs npm git -y
+    ```
+
+*   **Linux (Arch Linux):**
+    ```sh
+    sudo pacman -Syu nodejs npm git
+    ```
+
+*   **Linux (Fedora/RHEL/CentOS):**
+    ```sh
+    sudo dnf install nodejs npm git -y
+    ```
+
+---
+
+## Contributing
+
+Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+
+1.  Fork the Project
+2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the Branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
+
+---
+
+## License
+
+Distributed under the MIT License. See `LICENSE` file for more information.
+
+---
+
+## Acknowledgments
+
+*   This project was built iteratively, and I'd like to thank you for the detailed feedback and feature requests that shaped it into what it is today.
+*   The Eisenhower Matrix concept, originally from Dwight D. Eisenhower.
+
+

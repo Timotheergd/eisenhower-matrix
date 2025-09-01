@@ -8,7 +8,7 @@ import PriorityList from './PriorityList';
 import CompletedTasksList from './CompletedTasksList';
 import { Calendar, Grid } from 'lucide-react';
 
-const MatrixPage = ({ tasks, setTasks, completedTasks, setCompletedTasks, retentionDays, setRetentionDays, selectedTask, setSelectedTask, onEditTask, onToggleToday }) => {
+const MatrixPage = ({ tasks, setTasks, completedTasks, setCompletedTasks, retentionDays, setRetentionDays, selectedTask, setSelectedTask, onEditTask, onToggleToday, onDuplicateTask }) => {
   const [showToday, setShowToday] = useState(true);
   const [showOther, setShowOther] = useState(true);
 
@@ -22,7 +22,6 @@ const MatrixPage = ({ tasks, setTasks, completedTasks, setCompletedTasks, retent
 
   const tasksWithPositions = useTaskPositions(filteredTasks);
 
-  // MODIFIED: This list is now derived from the filtered tasks, so it matches the graph
   const displayedPriorityList = useMemo(() => {
     const MAX_RAW_SCORE = Math.pow(100, 2) + 2 * Math.pow(100, 2);
     return filteredTasks.map(task => {
@@ -85,13 +84,13 @@ const MatrixPage = ({ tasks, setTasks, completedTasks, setCompletedTasks, retent
             onDelete={handleDeleteTask}
             onComplete={handleCompleteTask}
             onToggleToday={onToggleToday}
+            onDuplicate={onDuplicateTask} // MODIFIED: Pass handler
             setTasks={setTasks}
             tasks={tasks}
           />
         </div>
       </div>
 
-      {/* MODIFIED: Pass the new filtered list to the component */}
       <PriorityList tasks={displayedPriorityList} onTaskSelect={setSelectedTask} />
       
       <CompletedTasksList 
