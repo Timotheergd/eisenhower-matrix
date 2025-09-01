@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Target, Edit2, Trash2, CheckCircle, Save, X, Calendar } from 'lucide-react';
+import { Target, Edit2, Trash2, CheckCircle, Save, X, Calendar as CalendarIcon, PlusCircle, MinusCircle } from 'lucide-react';
 import { calculateUrgency, getQuadrant, getDifficultyColor, formatDateEuropean } from '../helpers';
 
-const TaskDetails = ({ selectedTask, onEdit, onDelete, onComplete, setTasks, tasks }) => {
+const TaskDetails = ({ selectedTask, onEdit, onDelete, onComplete, onToggleToday, setTasks, tasks }) => {
   const [editingInline, setEditingInline] = useState(null);
   const [tempTitle, setTempTitle] = useState('');
 
@@ -24,7 +24,7 @@ const TaskDetails = ({ selectedTask, onEdit, onDelete, onComplete, setTasks, tas
     );
   }
 
-  const { id, title, description, importance, difficulty, deadline } = selectedTask;
+  const { id, title, description, importance, difficulty, deadline, isToday } = selectedTask;
   const urgency = calculateUrgency(deadline);
   const quadrant = getQuadrant(importance, urgency);
 
@@ -64,12 +64,18 @@ const TaskDetails = ({ selectedTask, onEdit, onDelete, onComplete, setTasks, tas
           )}
         </div>
         <p className="text-gray-600">{description || <span className="italic">No description</span>}</p>
+        
+        <button onClick={() => onToggleToday(id)} className={`w-full flex items-center justify-center gap-2 text-sm px-3 py-2 rounded-lg transition-colors ${isToday ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-blue-100 text-blue-700 hover:bg-blue-200'}`}>
+          {isToday ? <MinusCircle size={16} /> : <PlusCircle size={16} />}
+          {isToday ? "Remove from Today's Plan" : "Add to Today's Plan"}
+        </button>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-3"><div className="flex items-center justify-between"><span className="text-sm font-semibold text-gray-700">Importance</span><div className="text-xl font-bold text-indigo-600">{importance}</div></div><div className="w-full bg-gray-200 rounded-full h-2 mt-2"><div className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full" style={{ width: `${importance}%` }} /></div></div>
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-3"><div className="flex items-center justify-between"><span className="text-sm font-semibold text-gray-700">Urgency</span><div className="text-xl font-bold text-orange-600">{urgency}</div></div><div className="w-full bg-gray-200 rounded-full h-2 mt-2"><div className="bg-gradient-to-r from-orange-500 to-red-500 h-2 rounded-full" style={{ width: `${urgency}%` }} /></div></div>
         </div>
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-3"><span className="text-sm font-semibold text-gray-700">Difficulty</span><div className="flex items-center gap-3"><div className="text-xl font-bold text-gray-800">{difficulty}</div><div className="w-full bg-gray-200 rounded-full h-3"><div className="h-3 rounded-full" style={{ width: `${difficulty}%`, backgroundColor: getDifficultyColor(difficulty) }} /></div></div></div>
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-3"><div className="flex items-center gap-2"><Calendar className="w-4 h-4 text-gray-600" /><span className="text-sm font-semibold text-gray-700">Deadline</span></div><div className="text-lg font-bold text-gray-800">{formatDateEuropean(deadline)}</div></div>
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-3"><div className="flex items-center gap-2"><CalendarIcon className="w-4 h-4 text-gray-600" /><span className="text-sm font-semibold text-gray-700">Deadline</span></div><div className="text-lg font-bold text-gray-800">{formatDateEuropean(deadline)}</div></div>
         <div className="flex gap-3 pt-2">
           <button onClick={() => onEdit(selectedTask)} className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"><Edit2 size={16} /> Edit</button>
           <button onClick={() => onDelete(id)} className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center justify-center gap-2"><Trash2 size={16} /> Delete</button>

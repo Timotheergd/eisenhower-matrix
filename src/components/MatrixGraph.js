@@ -1,19 +1,22 @@
 import React from 'react';
 import { getDifficultyColor } from '../helpers';
+import { Calendar } from 'lucide-react';
 
 const GRAPH_WIDTH = 600;
 const GRAPH_HEIGHT = 400;
 const MARGIN = 20;
 
-// This is the new, advanced label placement component with Leader Lines
 const SmartLabels = ({ tasksWithPositions, selectedTask }) => {
+  if (!tasksWithPositions || !tasksWithPositions.positions || tasksWithPositions.positions.length === 0) {
+    return null;
+  }
+
   const { positions, config } = tasksWithPositions;
   const { fontSize, labelOffset } = config;
 
-  const placedElements = []; // Will store bboxes of points and final labels
+  const placedElements = [];
+  const POINT_RADIUS = 10;
 
-  // --- INITIAL SETUP ---
-  // 1. Add all points as initial obstacles
   positions.forEach(task => {
     placedElements.push({
       type: 'point',
@@ -22,14 +25,15 @@ const SmartLabels = ({ tasksWithPositions, selectedTask }) => {
     });
   });
 
-  // 2. Add graph boundaries as obstacles
-  placedElements.push({ type: 'boundary', bbox: { x: -1, y: -1, width: 1, height: GRAPH_HEIGHT + 2 } }); // Left
-  placedElements.push({ type: 'boundary', bbox: { x: GRAPH_WIDTH, y: -1, width: 1, height: GRAPH_HEIGHT + 2 } }); // Right
-  placedElements.push({ type: 'boundary', bbox: { x: -1, y: -1, width: GRAPH_WIDTH + 2, height: 1 } }); // Top
-  placedElements.push({ type: 'boundary', bbox: { x: -1, y: GRAPH_HEIGHT, width: GRAPH_WIDTH + 2, height: 1 } }); // Bottom
+  placedElements.push({ type: 'boundary', bbox: { x: -1, y: -1, width: 1, height: GRAPH_HEIGHT + 2 } });
+  placedElements.push({ type: 'boundary', bbox: { x: GRAPH_WIDTH, y: -1, width: 1, height: GRAPH_HEIGHT + 2 } });
+  placedElements.push({ type: 'boundary', bbox: { x: -1, y: -1, width: GRAPH_WIDTH + 2, height: 1 } });
+  placedElements.push({ type: 'boundary', bbox: { x: -1, y: GRAPH_HEIGHT, width: GRAPH_WIDTH + 2, height: 1 } });
 
-
-  const doesOverlap = (box1, box2) => !(box2.x > box1.x + box1.width || box2.x + box2.width < box1.x || box2.y > box1.y + box1.height || box2.y + box2.height < box1.y);
+  const doesOverlap = (box1, box2) => {
+    if (!box1 || !box2) return false;
+    return !(box2.x > box1.x + box1.width || box2.x + box2.width < box1.x || box2.y > box1.y + box1.height || box2.y + box2.height < box1.y);
+  };
 
   const labelsAndLines = positions.map(task => {
     const { x, y, title, id } = task;
@@ -39,7 +43,6 @@ const SmartLabels = ({ tasksWithPositions, selectedTask }) => {
     const labelWidth = truncatedTitle.length * charWidth;
     const labelHeight = fontSize;
 
-    // --- STAGE 1: ATTEMPT SIMPLE PLACEMENT ---
     const simplePositions = [
       { yOffset: -labelOffset, xOffset: 0, anchor: 'middle' },
       { yOffset: labelOffset + 5, xOffset: 0, anchor: 'middle' },
@@ -58,26 +61,13 @@ const SmartLabels = ({ tasksWithPositions, selectedTask }) => {
       if (!placedElements.some(el => doesOverlap(el.bbox, labelBox))) {
         placedElements.push({ type: 'label', id, bbox: labelBox });
         return (
-          <text 
-            key={id} 
-            x={x + pos.xOffset} 
-            y={y + pos.yOffset} 
-            textAnchor={pos.anchor} 
-            className="font-medium fill-gray-900 pointer-events-none" 
-            style={{ 
-              fontSize: `${fontSize}px`, 
-              fontWeight: isSelected ? 'bold' : 'normal',
-              // MODIFIED: Added text shadow
-              textShadow: '0 0 3px white, 0 0 3px white, 0 0 3px white' 
-            }}
-          >
+          <text key={id} x={x + pos.xOffset} y={y + pos.yOffset} textAnchor={pos.anchor} className="font-medium fill-gray-900 pointer-events-none" style={{ fontSize: `${fontSize}px`, fontWeight: isSelected ? 'bold' : 'normal', textShadow: '0 0 3px white, 0 0 3px white, 0 0 3px white' }}>
             {truncatedTitle}
           </text>
         );
       }
     }
 
-    // --- STAGE 2: SPIRAL SEARCH FOR LEADER LINE PLACEMENT ---
     let foundSpot = false;
     let finalLabelPos = {};
     let spiralRadius = labelOffset * 1.5;
@@ -114,24 +104,12 @@ const SmartLabels = ({ tasksWithPositions, selectedTask }) => {
       return (
         <g key={id}>
           <line x1={lineStartX} y1={lineStartY} x2={lineEndX} y2={finalY} stroke="rgba(55, 65, 81, 0.6)" strokeWidth="1" />
-          <text 
-            x={finalX} 
-            y={finalY + fontSize / 3} 
-            textAnchor={anchor} 
-            className="font-medium fill-gray-900 pointer-events-none" 
-            style={{ 
-              fontSize: `${fontSize}px`, 
-              fontWeight: isSelected ? 'bold' : 'normal',
-              // MODIFIED: Added text shadow
-              textShadow: '0 0 3px white, 0 0 3px white, 0 0 3px white'
-            }}
-          >
+          <text x={finalX} y={finalY + fontSize / 3} textAnchor={anchor} className="font-medium fill-gray-900 pointer-events-none" style={{ fontSize: `${fontSize}px`, fontWeight: isSelected ? 'bold' : 'normal', textShadow: '0 0 3px white, 0 0 3px white, 0 0 3px white' }}>
             {truncatedTitle}
           </text>
         </g>
       );
     }
-
     return null;
   });
 
@@ -140,6 +118,8 @@ const SmartLabels = ({ tasksWithPositions, selectedTask }) => {
 
 
 const MatrixGraph = ({ tasksWithPositions, selectedTask, onTaskSelect }) => {
+  const positions = tasksWithPositions?.positions || [];
+
   return (
     <div className="bg-white rounded-xl shadow-lg border p-4 md:p-8">
       <div className="relative">
@@ -157,10 +137,15 @@ const MatrixGraph = ({ tasksWithPositions, selectedTask, onTaskSelect }) => {
           <line x1={GRAPH_WIDTH/2} y1="0" x2={GRAPH_WIDTH/2} y2={GRAPH_HEIGHT} stroke="#94a3b8" strokeWidth="1" strokeDasharray="4,4" />
           <line x1="0" y1={GRAPH_HEIGHT/2} x2={GRAPH_WIDTH} y2={GRAPH_HEIGHT/2} stroke="#94a3b8" strokeWidth="1" strokeDasharray="4,4" />
           
-          {tasksWithPositions.positions.map(task => {
+          {positions.map(task => {
             const isSelected = selectedTask?.id === task.id;
             return (
-              <circle key={task.id} cx={task.x} cy={task.y} r={isSelected ? 10 : 6} fill={getDifficultyColor(task.difficulty)} stroke={isSelected ? '#333' : 'white'} strokeWidth={2} className="cursor-pointer transition-all duration-200" onClick={() => onTaskSelect(task.id === selectedTask?.id ? null : task)} />
+              <g key={task.id}>
+                <circle cx={task.x} cy={task.y} r={isSelected ? 10 : 6} fill={getDifficultyColor(task.difficulty)} stroke={isSelected ? '#333' : 'white'} strokeWidth={2} className="cursor-pointer transition-all duration-200" onClick={() => onTaskSelect(task.id === selectedTask?.id ? null : task)} />
+                {task.isToday && (
+                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="gold" stroke="orange" strokeWidth="0.5" transform={`translate(${task.x - 6}, ${task.y - 16}) scale(0.5)`} />
+                )}
+              </g>
             );
           })}
           <SmartLabels tasksWithPositions={tasksWithPositions} selectedTask={selectedTask} />

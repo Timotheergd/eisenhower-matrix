@@ -1,21 +1,26 @@
 import React, { useState, useEffect } from 'react';
 
-const TaskModal = ({ isOpen, onClose, onSubmit, editingTask }) => {
+const TaskModal = ({ isOpen, onClose, onSubmit, editingTask, currentPage }) => {
   const [formData, setFormData] = useState({
     title: '', description: '', importance: 50, difficulty: 50, deadline: ''
   });
+  // NEW: State for the "Add to Today" checkbox
+  const [addToToday, setAddToToday] = useState(currentPage === 'today');
 
   useEffect(() => {
     if (editingTask) {
       setFormData(editingTask);
+      setAddToToday(editingTask.isToday);
     } else {
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       setFormData({
         title: '', description: '', importance: 50, difficulty: 50, deadline: tomorrow.toISOString().split('T')[0]
       });
+      // Default checkbox to true if modal is opened from Today page
+      setAddToToday(currentPage === 'today');
     }
-  }, [editingTask]);
+  }, [editingTask, currentPage]);
 
   if (!isOpen) return null;
 
@@ -30,7 +35,7 @@ const TaskModal = ({ isOpen, onClose, onSubmit, editingTask }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.title || !formData.deadline) return;
-    onSubmit(formData);
+    onSubmit(formData, addToToday);
   };
 
   return (
@@ -58,6 +63,17 @@ const TaskModal = ({ isOpen, onClose, onSubmit, editingTask }) => {
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Deadline *</label>
               <input type="date" name="deadline" value={formData.deadline} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required />
+            </div>
+            {/* NEW: "Add to Today" checkbox */}
+            <div className="flex items-center gap-2">
+                <input 
+                    type="checkbox"
+                    id="addToToday"
+                    checked={addToToday}
+                    onChange={(e) => setAddToToday(e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                />
+                <label htmlFor="addToToday" className="text-sm text-gray-700">Add to Today's Plan</label>
             </div>
             <div className="flex gap-4 pt-4">
               <button type="button" onClick={onClose} className="flex-1 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50">Cancel</button>
