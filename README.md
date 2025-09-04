@@ -80,13 +80,12 @@ You will need `Node.js` (which includes `npm`) and `git` installed on your syste
 1.  **Clone the repository**
     Open your terminal or command prompt and run:
     ```sh
-    git clone https://github.com/your-username/your-repository-name.git
+    git clone https://github.com/Timotheergd/eisenhower-matrix
     ```
-    *(Replace `your-username/your-repository-name` with the actual URL of your GitHub repository)*
 
 2.  **Navigate to the project directory**
     ```sh
-    cd your-repository-name
+    cd eisenhower-matrix
     ```
 
 3.  **Install NPM packages**
