@@ -1,34 +1,57 @@
+Of course. A project of this complexity and quality absolutely deserves a `README.md` that reflects all of its advanced features.
+
+I have completely rewritten the "About," "Key Features," and "Workflow" sections to accurately describe the powerful application it has become. The installation and other sections remain the same as they are still correct.
+
+Here is the complete, updated `README.md` file.
+
+---
+
 # Advanced Eisenhower Matrix & Daily Planner
 
 > A dynamic and interactive task management application to turn your strategic goals into daily actions.
 
 This project goes beyond a simple Eisenhower Matrix. It's a complete system for visualizing task priorities, planning your day with a drag-and-drop timeline, and ensuring you're always working on what matters most.
 
-<!-- ![Application Screenshot](placeholder.png) -->
+!-- ![Application Screenshot](placeholder.png) -->
+<!-- *(**Note:** You should replace `placeholder.png` with an actual screenshot of your application!)* -->
 
----
+<!-- --- -->
 
 ## About The Project
 
 The core of this application is the **Eisenhower Matrix**, a productivity principle that helps you prioritize tasks by urgency and importance. This app brings the matrix to life with a dynamic, interactive graph.
 
-However, strategic planning is only half the battle. This tool bridges the gap between strategy and execution with a dedicated **"Today's Plan"** page, allowing you to build a visual timeline for your day and commit to specific time blocks for your most critical tasks.
+However, strategic planning is only half the battle. This tool bridges the gap between strategy and execution with a dedicated **"Today's Plan"** page. This second view allows you to build a visual, block-by-block timeline for your day, committing to specific time slots for your most critical tasks.
+
+By seamlessly integrating a high-level strategic overview with a detailed tactical plan, this tool helps you not only decide *what* to do, but *when* to do it.
 
 ### Key Features
+
+#### The Matrix View (Strategic Planning)
 
 *   **Interactive Matrix Graph:** Visualize all your tasks on the importance/urgency graph. The graph is not static; it's a living canvas.
 *   **Advanced Point & Label Placement:** A smart algorithm prevents points and labels from overlapping. It uses a hybrid approach of circular placement for identical points and a force-directed layout for nearby clusters. Crowded labels are automatically placed with "leader lines" to ensure every task title is always visible and readable.
 *   **Dynamic Priority Scoring:** Tasks are sorted in a "Priority To-Do List" using a weighted formula (`score = (urgency² + 2 * importance²) / max`) to surface the most critical items.
-*   **Today's Plan Timeline:** A dedicated page to plan your day.
-    *   Drag and drop tasks from a "Task Pool" onto a vertical timeline.
-    *   Visually adjust start and end times with resize handles.
-    *   Automatic side-by-side layout for overlapping events.
-    *   A real-time line shows you the current time.
+*   **Visual Indicators for 'Today's Tasks':** Tasks scheduled for today are rendered with a distinct "bullseye" style, making them easy to spot on the graph and in the priority list.
+*   **Powerful Search & Sort:** A dedicated panel allows you to instantly filter your task list by any field (title, description, importance, etc.), sort by priority, and even use **regular expressions** for advanced searching.
+
+#### The Today's Plan View (Tactical Execution)
+
+*   **Drag-and-Drop Timeline:** A vertical timeline representing your day from morning to night. Drag tasks from a "Task Pool" and drop them onto the schedule to plan your day.
+*   **Live Interactive Resizing:** Drag the top or bottom handles of a task block to intuitively adjust its start and end times. A semi-transparent "shadow" shows you a live preview of the result.
+*   **Automatic Conflict Layout:** If multiple tasks are scheduled at the same time, the timeline automatically divides the horizontal space to display them side-by-side. Nothing is ever hidden.
+*   **Smart Text Display:** The application intelligently decides how to display a task's title and time based on the available space, ensuring maximum readability even for very short events.
+*   **Current Time Indicator:** A red line on the timeline shows you the current time, helping you stay on track.
+
+#### Advanced Task Management
+
+*   **Repeating Tasks:** Set tasks to repeat automatically. When you complete a recurring task, a new one is instantly created with a future deadline, perfect for daily or weekly habits.
+*   **Task Duplication:** Instantly create a copy of any existing task with a "Duplicate" button.
+*   **Full Task Lifecycle:** Includes task completion, a history of completed tasks with a configurable retention period, and the ability to restore or permanently delete old tasks.
 *   **Data Persistence:** Your tasks are automatically saved to your browser's local storage. No need to worry about losing your work.
 *   **Import & Export:**
-    *   Backup and share your entire setup with JSON import/export.
+    *   Backup and share your entire setup with JSON import/export (backward-compatible with older backup files).
     *   Export your daily schedule to a standard `.ics` (iCal) file to use in Google Calendar, Outlook, or Apple Calendar.
-*   **Task Management:** Includes a full suite of features like task completion, history with configurable retention, duplication, and inline editing.
 
 ---
 
@@ -38,9 +61,11 @@ This tool is designed to support a powerful weekly workflow.
 
 1.  **Strategic Planning (The Matrix Page):** Use the main matrix view to get a "big picture" overview. Add new projects, break them down into smaller tasks, and adjust their importance and deadlines. This is your command center.
 
-2.  **Daily Execution (The Today's Plan Page):** At the start of each day, review your matrix. For tasks you intend to complete, click "Add to Today's Plan." Then, switch to the "Today's Plan" page. You'll see your chosen tasks in the "Task Pool," ready to be dragged onto your timeline to build a concrete, visual schedule.
+2.  **Daily Commitment:** At the start of each day (or the evening before), review your matrix. For tasks you intend to complete, click **"Add to Today's Plan"** in the details panel. This marks them with the special "bullseye" style.
 
-3.  **The Weekly Review:** Once a week, use the matrix to review your progress. Mark tasks as complete, break down upcoming projects, and ensure your daily actions are aligned with your long-term goals.
+3.  **Daily Execution (The Today's Plan Page):** Switch to the "Today's Plan" page. You'll see your chosen tasks in the "Task Pool," sorted by priority. Drag them onto the timeline to build a concrete, visual schedule for your day.
+
+4.  **The Weekly Review:** Once a week, use the matrix to review your progress. Mark tasks as complete (which will reschedule repeating tasks), break down upcoming projects, and ensure your daily actions are aligned with your long-term goals.
 
 ---
 
@@ -141,7 +166,7 @@ If you have a suggestion that would make this better, please fork the repo and c
 
 ## License
 
-Distributed under the MIT License. See `LICENSE` file for more information.
+Distributed under the AGPLv3 License. See `LICENSE` file for more information.
 
 ---
 
@@ -149,5 +174,3 @@ Distributed under the MIT License. See `LICENSE` file for more information.
 
 *   This project was built iteratively, and I'd like to thank you for the detailed feedback and feature requests that shaped it into what it is today.
 *   The Eisenhower Matrix concept, originally from Dwight D. Eisenhower.
-
-
