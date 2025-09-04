@@ -1,21 +1,8 @@
-Of course. A project of this complexity and quality absolutely deserves a `README.md` that reflects all of its advanced features.
-
-I have completely rewritten the "About," "Key Features," and "Workflow" sections to accurately describe the powerful application it has become. The installation and other sections remain the same as they are still correct.
-
-Here is the complete, updated `README.md` file.
-
----
-
 # Advanced Eisenhower Matrix & Daily Planner
 
 > A dynamic and interactive task management application to turn your strategic goals into daily actions.
 
 This project goes beyond a simple Eisenhower Matrix. It's a complete system for visualizing task priorities, planning your day with a drag-and-drop timeline, and ensuring you're always working on what matters most.
-
-!-- ![Application Screenshot](placeholder.png) -->
-<!-- *(**Note:** You should replace `placeholder.png` with an actual screenshot of your application!)* -->
-
-<!-- --- -->
 
 ## About The Project
 
