@@ -45,6 +45,40 @@ const App = () => {
     closeModal();
   };
 
+  const handleCompleteTask = (taskId) => {
+    const taskToComplete = tasks.find(t => t.id === taskId);
+    if (!taskToComplete) return;
+
+    if (taskToComplete.repeatDays && taskToComplete.repeatDays > 0) {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + parseInt(taskToComplete.repeatDays));
+      const newDeadline = tomorrow.toISOString().split('T')[0];
+
+      const newTask = {
+        ...taskToComplete,
+        id: Date.now(),
+        deadline: newDeadline,
+        isToday: false,
+        startTime: null,
+        endTime: null,
+      };
+      setTasks([...tasks.filter(t => t.id !== taskId), newTask]);
+    } else {
+      setTasks(tasks.filter(t => t.id !== taskId));
+    }
+
+    const newCompletedTask = { ...taskToComplete, completedAt: new Date().toISOString() };
+    setCompletedTasks([newCompletedTask, ...completedTasks]);
+    setSelectedTask(null);
+  };
+
+  // NEW: Handler to permanently delete a completed task
+  const handleDeleteCompletedTask = (taskId) => {
+    if (window.confirm("Are you sure you want to permanently delete this completed task? This cannot be undone.")) {
+      setCompletedTasks(completedTasks.filter(t => t.id !== taskId));
+    }
+  };
+
   const handleDuplicateTask = (taskId) => {
     const taskToDuplicate = tasks.find(t => t.id === taskId);
     if (!taskToDuplicate) return;
@@ -52,12 +86,12 @@ const App = () => {
       ...taskToDuplicate,
       id: Date.now(),
       title: `${taskToDuplicate.title} (Copy)`,
-      isToday: false, // Duplicates are not automatically added to today's plan
+      isToday: false,
       startTime: null,
       endTime: null,
     };
     setTasks([...tasks, newTask]);
-    setSelectedTask(newTask); // Select the new duplicated task
+    setSelectedTask(newTask);
   };
 
   const handleToggleToday = (taskId) => {
@@ -138,7 +172,9 @@ const App = () => {
               setSelectedTask={setSelectedTask}
               onEditTask={openModal}
               onToggleToday={handleToggleToday}
-              onDuplicateTask={handleDuplicateTask} // MODIFIED: Pass handler
+              onDuplicateTask={handleDuplicateTask}
+              onCompleteTask={handleCompleteTask}
+              onDeleteCompletedTask={handleDeleteCompletedTask} // MODIFIED: Pass handler
             />
           )}
           {currentPage === 'today' && (
@@ -147,7 +183,6 @@ const App = () => {
               onScheduleTask={handleScheduleTask}
               onUnscheduleTask={handleUnscheduleTask}
               onAddTask={() => openModal()}
-              // MODIFIED: Pass handlers for shortcut
               onViewDetails={(task) => {
                 setSelectedTask(task);
                 setCurrentPage('matrix');

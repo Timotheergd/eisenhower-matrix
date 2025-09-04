@@ -1,12 +1,11 @@
 import React from 'react';
-import { Settings, CheckCircle, RotateCcw } from 'lucide-react';
+import { Settings, CheckCircle, RotateCcw, Trash2 } from 'lucide-react';
 import { formatDateEuropean } from '../helpers';
 
-const CompletedTasksList = ({ tasks, retentionDays, onSetRetentionDays, onRestoreTask }) => {
+const CompletedTasksList = ({ tasks, retentionDays, onSetRetentionDays, onRestoreTask, onDeleteCompletedTask }) => {
   return (
     <div className="mt-8 bg-white rounded-xl shadow-lg border p-6">
       <div className="flex justify-between items-center mb-4">
-        {/* MODIFIED: Added task count */}
         <h2 className="text-2xl font-bold text-gray-800">
           Completed Tasks ({tasks.length})
         </h2>
@@ -24,9 +23,15 @@ const CompletedTasksList = ({ tasks, retentionDays, onSetRetentionDays, onRestor
               <p className="text-gray-500 line-through">{task.title}</p>
               <span className="text-xs text-gray-400"> (Completed: {formatDateEuropean(task.completedAt)})</span>
             </div>
-            <button onClick={() => onRestoreTask(task.id)} className="p-1 text-gray-500 hover:text-indigo-600">
-              <RotateCcw size={16} />
-            </button>
+            <div className="flex items-center gap-2">
+              <button onClick={() => onRestoreTask(task.id)} className="p-1 text-gray-500 hover:text-indigo-600" title="Restore Task">
+                <RotateCcw size={16} />
+              </button>
+              {/* NEW: Delete Button */}
+              <button onClick={() => onDeleteCompletedTask(task.id)} className="p-1 text-gray-500 hover:text-red-600" title="Permanently Delete">
+                <Trash2 size={16} />
+              </button>
+            </div>
           </div>
         )) : <p className="text-gray-500">No recently completed tasks.</p>}
       </div>

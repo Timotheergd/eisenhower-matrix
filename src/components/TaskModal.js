@@ -1,42 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 
 const TaskModal = ({ isOpen, onClose, onSubmit, editingTask, currentPage }) => {
   const [formData, setFormData] = useState({
-    title: '', description: '', importance: 50, difficulty: 50, deadline: ''
-  });
-  // NEW: State for the "Add to Today" checkbox
-  const [addToToday, setAddToToday] = useState(currentPage === 'today');
+    title: '', description: '', importance: 50, difficulty: 50, deadline: '', repeatDays: null
+  })
+  const [addToToday, setAddToToday] = useState(currentPage === 'today')
+  const [isRepeating, setIsRepeating] = useState(false)
 
   useEffect(() => {
     if (editingTask) {
-      setFormData(editingTask);
-      setAddToToday(editingTask.isToday);
+      setFormData({ ...editingTask, repeatDays: editingTask.repeatDays || null })
+      setAddToToday(editingTask.isToday)
+      setIsRepeating(!!editingTask.repeatDays)
     } else {
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrow = new Date()
+      tomorrow.setDate(tomorrow.getDate() + 1)
       setFormData({
-        title: '', description: '', importance: 50, difficulty: 50, deadline: tomorrow.toISOString().split('T')[0]
-      });
-      // Default checkbox to true if modal is opened from Today page
-      setAddToToday(currentPage === 'today');
+        title: '', description: '', importance: 50, difficulty: 50, deadline: tomorrow.toISOString().split('T')[0], repeatDays: null
+      })
+      setAddToToday(currentPage === 'today')
+      setIsRepeating(false)
     }
-  }, [editingTask, currentPage]);
+  }, [editingTask, currentPage])
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   const handleChange = (e) => {
-    const { name, value, type } = e.target;
+    const { name, value, type } = e.target
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'range' ? parseInt(value) : value
-    }));
-  };
+      [name]: type === 'range' || type === 'number' ? parseInt(value) : value
+    }))
+  }
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!formData.title || !formData.deadline) return;
-    onSubmit(formData, addToToday);
-  };
+    e.preventDefault()
+    if (!formData.title || !formData.deadline) return
+    const finalFormData = { ...formData, repeatDays: isRepeating ? formData.repeatDays : null }
+    onSubmit(finalFormData, addToToday)
+  }
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -64,7 +66,27 @@ const TaskModal = ({ isOpen, onClose, onSubmit, editingTask, currentPage }) => {
               <label className="block text-sm font-semibold text-gray-700 mb-1">Deadline *</label>
               <input type="date" name="deadline" value={formData.deadline} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required />
             </div>
-            {/* NEW: "Add to Today" checkbox */}
+            {/* NEW: Repeat Task Section */}
+            <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+              <input 
+                type="checkbox"
+                id="isRepeating"
+                checked={isRepeating}
+                onChange={(e) => setIsRepeating(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+              />
+              <label htmlFor="isRepeating" className="text-sm font-medium text-gray-700">Repeat task every</label>
+              <input 
+                type="number"
+                name="repeatDays"
+                value={formData.repeatDays || ''}
+                onChange={handleChange}
+                disabled={!isRepeating}
+                className="w-20 px-2 py-1 border border-gray-300 rounded-md disabled:bg-gray-200"
+                min="1"
+              />
+              <span className="text-sm text-gray-700">days</span>
+            </div>
             <div className="flex items-center gap-2">
                 <input 
                     type="checkbox"
@@ -83,7 +105,7 @@ const TaskModal = ({ isOpen, onClose, onSubmit, editingTask, currentPage }) => {
         </form>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default TaskModal;
+export default TaskModal

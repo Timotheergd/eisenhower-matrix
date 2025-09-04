@@ -6,13 +6,19 @@ import MatrixGraph from './MatrixGraph';
 import TaskDetails from './TaskDetails';
 import PriorityList from './PriorityList';
 import CompletedTasksList from './CompletedTasksList';
+import SearchPanel from './SearchPanel';
 import { Calendar, Grid } from 'lucide-react';
 
-const MatrixPage = ({ tasks, setTasks, completedTasks, setCompletedTasks, retentionDays, setRetentionDays, selectedTask, setSelectedTask, onEditTask, onToggleToday, onDuplicateTask }) => {
+const MatrixPage = ({ tasks, setTasks, completedTasks, setCompletedTasks, retentionDays, setRetentionDays, selectedTask, setSelectedTask, onEditTask, onToggleToday, onDuplicateTask, onCompleteTask, onDeleteCompletedTask }) => {
   const [showToday, setShowToday] = useState(true);
   const [showOther, setShowOther] = useState(true);
 
-  const filteredTasks = useMemo(() => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchField, setSearchField] = useState('title');
+  const [useRegex, setUseRegex] = useState(false);
+  const [sortBy, setSortBy] = useState('score');
+
+  const filteredTasksForGraph = useMemo(() => {
     return tasks.filter(task => {
       if (showToday && task.isToday) return true;
       if (showOther && !task.isToday) return true;
@@ -20,16 +26,44 @@ const MatrixPage = ({ tasks, setTasks, completedTasks, setCompletedTasks, retent
     });
   }, [tasks, showToday, showOther]);
 
-  const tasksWithPositions = useTaskPositions(filteredTasks);
+  const tasksWithPositions = useTaskPositions(filteredTasksForGraph);
 
   const displayedPriorityList = useMemo(() => {
     const MAX_RAW_SCORE = Math.pow(100, 2) + 2 * Math.pow(100, 2);
-    return filteredTasks.map(task => {
+    
+    let processedTasks = tasks.map(task => {
         const urgency = calculateUrgency(task.deadline);
         const score = (Math.pow(urgency, 2) + 2 * Math.pow(task.importance, 2)) / MAX_RAW_SCORE * 100;
         return { ...task, urgency, score };
-    }).sort((a, b) => b.score - a.score);
-  }, [filteredTasks]);
+    });
+
+    if (searchQuery) {
+      processedTasks = processedTasks.filter(task => {
+        const fieldValue = String(task[searchField] || '').toLowerCase();
+        const query = searchQuery.toLowerCase();
+        
+        if (useRegex) {
+          try {
+            const regex = new RegExp(query, 'i');
+            return regex.test(fieldValue);
+          } catch (e) {
+            return false;
+          }
+        } else {
+          return fieldValue.includes(query);
+        }
+      });
+    }
+
+    processedTasks.sort((a, b) => {
+      if (sortBy === 'score') return b.score - a.score;
+      if (sortBy === 'urgency') return b.urgency - a.urgency;
+      if (sortBy === 'importance') return b.importance - a.importance;
+      return 0;
+    });
+
+    return processedTasks;
+  }, [tasks, searchQuery, searchField, useRegex, sortBy]);
 
   const visibleCompletedTasks = useMemo(() => {
     const retentionCutoff = new Date();
@@ -37,13 +71,9 @@ const MatrixPage = ({ tasks, setTasks, completedTasks, setCompletedTasks, retent
     return completedTasks.filter(t => new Date(t.completedAt) > retentionCutoff);
   }, [completedTasks, retentionDays]);
 
-  const handleCompleteTask = (taskId) => {
-    const taskToComplete = tasks.find(t => t.id === taskId);
-    if (!taskToComplete) return;
-    const newCompletedTask = { ...taskToComplete, completedAt: new Date().toISOString() };
-    setCompletedTasks([newCompletedTask, ...completedTasks]);
+  const handleDeleteTask = (taskId) => {
     setTasks(tasks.filter(t => t.id !== taskId));
-    setSelectedTask(null);
+    if (selectedTask?.id === taskId) setSelectedTask(null);
   };
 
   const handleRestoreTask = (taskId) => {
@@ -52,11 +82,6 @@ const MatrixPage = ({ tasks, setTasks, completedTasks, setCompletedTasks, retent
     const { completedAt, ...restoredTask } = taskToRestore;
     setTasks([...tasks, restoredTask]);
     setCompletedTasks(completedTasks.filter(t => t.id !== taskId));
-  };
-
-  const handleDeleteTask = (taskId) => {
-    setTasks(tasks.filter(t => t.id !== taskId));
-    if (selectedTask?.id === taskId) setSelectedTask(null);
   };
 
   return (
@@ -82,22 +107,39 @@ const MatrixPage = ({ tasks, setTasks, completedTasks, setCompletedTasks, retent
             selectedTask={tasks.find(t => t.id === selectedTask?.id)}
             onEdit={onEditTask}
             onDelete={handleDeleteTask}
-            onComplete={handleCompleteTask}
+            onComplete={onCompleteTask}
             onToggleToday={onToggleToday}
-            onDuplicate={onDuplicateTask} // MODIFIED: Pass handler
+            onDuplicate={onDuplicateTask}
             setTasks={setTasks}
             tasks={tasks}
           />
         </div>
       </div>
 
-      <PriorityList tasks={displayedPriorityList} onTaskSelect={setSelectedTask} />
+      <div className="mt-8 bg-white rounded-xl shadow-lg border p-6">
+        <SearchPanel 
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          searchField={searchField}
+          setSearchField={setSearchField}
+          useRegex={useRegex}
+          setUseRegex={setUseRegex}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+        />
+        <PriorityList 
+          tasks={displayedPriorityList} 
+          onTaskSelect={setSelectedTask} 
+          displayFields={[sortBy, searchField]}
+        />
+      </div>
       
       <CompletedTasksList 
         tasks={visibleCompletedTasks}
         retentionDays={retentionDays}
         onSetRetentionDays={setRetentionDays}
         onRestoreTask={handleRestoreTask}
+        onDeleteCompletedTask={onDeleteCompletedTask} // MODIFIED: Pass handler
       />
     </>
   );

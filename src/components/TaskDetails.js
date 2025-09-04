@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Target, Edit2, Trash2, CheckCircle, Save, X, Calendar as CalendarIcon, PlusCircle, MinusCircle, Copy } from 'lucide-react';
+import { Target, Edit2, Trash2, CheckCircle, Save, X, Calendar as CalendarIcon, PlusCircle, MinusCircle, Copy, Repeat } from 'lucide-react';
 import { calculateUrgency, getQuadrant, getDifficultyColor, formatDateEuropean } from '../helpers';
 
 const TaskDetails = ({ selectedTask, onEdit, onDelete, onComplete, onToggleToday, onDuplicate, setTasks, tasks }) => {
@@ -10,7 +10,7 @@ const TaskDetails = ({ selectedTask, onEdit, onDelete, onComplete, onToggleToday
   useEffect(() => {
     if (selectedTask) {
       setTempTitle(selectedTask.title);
-      setIsDescriptionExpanded(false); // Reset on new task selection
+      setIsDescriptionExpanded(false);
     }
   }, [selectedTask]);
 
@@ -26,7 +26,7 @@ const TaskDetails = ({ selectedTask, onEdit, onDelete, onComplete, onToggleToday
     );
   }
 
-  const { id, title, description, importance, difficulty, deadline, isToday } = selectedTask;
+  const { id, title, description, importance, difficulty, deadline, isToday, repeatDays } = selectedTask;
   const urgency = calculateUrgency(deadline);
   const quadrant = getQuadrant(importance, urgency);
 
@@ -68,7 +68,6 @@ const TaskDetails = ({ selectedTask, onEdit, onDelete, onComplete, onToggleToday
             <h3 className="text-2xl font-bold text-gray-800 cursor-pointer" onClick={() => setEditingInline('title')}>{title}</h3>
           )}
         </div>
-        {/* MODIFIED: Description with "Read More" */}
         <div>
           <p className="text-gray-600" style={{ whiteSpace: 'pre-wrap' }}>
             {displayedDescription || <span className="italic">No description</span>}
@@ -91,8 +90,19 @@ const TaskDetails = ({ selectedTask, onEdit, onDelete, onComplete, onToggleToday
         </div>
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-3"><span className="text-sm font-semibold text-gray-700">Difficulty</span><div className="flex items-center gap-3"><div className="text-xl font-bold text-gray-800">{difficulty}</div><div className="w-full bg-gray-200 rounded-full h-3"><div className="h-3 rounded-full" style={{ width: `${difficulty}%`, backgroundColor: getDifficultyColor(difficulty) }} /></div></div></div>
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-3"><div className="flex items-center gap-2"><CalendarIcon className="w-4 h-4 text-gray-600" /><span className="text-sm font-semibold text-gray-700">Deadline</span></div><div className="text-lg font-bold text-gray-800">{formatDateEuropean(deadline)}</div></div>
+        
+        {/* NEW: Display repeat info */}
+        {repeatDays > 0 && (
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+            <div className="flex items-center gap-2">
+              <Repeat className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-semibold text-gray-700">Repeat</span>
+            </div>
+            <div className="text-lg font-bold text-gray-800">Every {repeatDays} day{repeatDays > 1 ? 's' : ''}</div>
+          </div>
+        )}
+
         <div className="flex gap-3 pt-2">
-          {/* NEW: Duplicate Button */}
           <button onClick={() => onDuplicate(id)} className="flex-1 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 flex items-center justify-center gap-2">
             <Copy size={16} /> Duplicate
           </button>
